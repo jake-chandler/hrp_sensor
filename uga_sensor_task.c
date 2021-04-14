@@ -19,6 +19,7 @@
 #include <string.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
 #include "osal.h"
 #include "sys_watchdog.h"
 #include "ble_common.h"
@@ -37,8 +38,9 @@
 #define RRS_TIMER_NOTIF (1 << 1)
 #define ADV_TIMER_NOTIF (1 << 2)  // notification from advertising timer
 #define BUTTON_NOTIF    (1 << 3)
-#define CLIENT_UPDATE_TIME (500)
+#define CLIENT_UPDATE_TIME (100)
 #define PERIPHERAL_DEVICE_NAME "uga_respiratory_mc"
+#define PI (3.1415926535)
 
 /* Advertising modes of sensor app */
 typedef enum {
@@ -60,6 +62,7 @@ __RETAINED static uint16_t adv_intv_min;
 __RETAINED static uint16_t adv_intv_max;
 /* Advertising timeout */
 __RETAINED static unsigned adv_timeout;
+
 
 /*
  * HRP advertising and scan response data
@@ -308,6 +311,7 @@ void uga_sensor_task(void *params)
         ble_service_t *rrs;
         ble_service_t *hrs;
         int8_t wdog_id;
+        uint x = 0;
 
         /* Register hrp_sensor task to be monitored by watchdog */
         wdog_id = sys_watchdog_register(false);
@@ -430,7 +434,10 @@ no_event:
                          */
 
                         /* BPM will be 255+/-5 to send both 8- and 16-bit values */
-                        rrs_meas.bpm = 30 + rand() % 11;
+                        x++;
+
+                        rrs_meas.bpm = 60 + 600*sin(x*(PI/180));
+
 
                         hrs_meas.bpm = 80 + rand() % 11;
 
